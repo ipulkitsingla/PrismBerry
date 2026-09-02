@@ -1,26 +1,41 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import MovieCard from '../components/MovieCard';
 import { Search } from 'lucide-react';
 
 export default function Home() {
+  const { user } = useContext(AuthContext);
   const [movies, setMovies] = useState([]);
+  const [myList, setMyList] = useState([]);
+  const [watchHistory, setWatchHistory] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchData = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/movies');
-        setMovies(res.data);
+        const [moviesRes, profileRes] = await Promise.all([
+          axios.get('http://localhost:5000/api/movies'),
+          user ? axios.get('http://localhost:5000/api/user/profile', {
+            headers: { Authorization: `Bearer ${user.token}` }
+          }).catch(() => null) : Promise.resolve(null)
+        ]);
+
+        setMovies(moviesRes.data);
+        
+        if (profileRes && profileRes.data) {
+          setMyList(profileRes.data.myList || []);
+          setWatchHistory(profileRes.data.watchHistory || []);
+        }
       } catch (err) {
-        console.error('Failed to fetch movies', err);
+        console.error('Failed to fetch data', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchMovies();
-  }, []);
+    fetchData();
+  }, [user]);
 
   const filteredMovies = movies.filter(m => 
     m.title.toLowerCase().includes(search.toLowerCase()) || 
@@ -65,8 +80,26 @@ export default function Home() {
 
       {/* Catalog Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 relative z-20">
+        
+        {/* Watch History Carousel */}
+        {user && watchHistory.length > 0 && !search && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-white border-l-4 border-red-600 pl-3 mb-6">Continue Watching</h2>
+            <div className="flex overflow-x-auto gap-6 pb-4 snap-x no-scrollbar">
+              {watchHistory.map(movie => (
+                <div key={`history-${movie._id}`} className="min-w-[150px] md:min-w-[180px] snap-start">
+                  <MovieCard movie={movie} initialInList={myList.some(m => m._id === movie._id)} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-bold text-white border-l-4 border-red-600 pl-3">Popular Titles</h2>
+          <h2 className="text-2xl font-bold text-white border-l-4 border-red-600 pl-3">
+            {search ? 'Search Results' : 'Popular Titles'}
+          </h2>
         </div>
         
         {loading ? (
@@ -76,7 +109,7 @@ export default function Home() {
         ) : filteredMovies.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {filteredMovies.map(movie => (
-              <MovieCard key={movie._id} movie={movie} />
+              <MovieCard key={movie._id} movie={movie} initialInList={myList.some(m => m._id === movie._id)} />
             ))}
           </div>
         ) : (

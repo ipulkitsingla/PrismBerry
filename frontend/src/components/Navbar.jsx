@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
-import { Film, User, LogOut } from 'lucide-react';
+import { Film, User, LogOut, Bookmark } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout } = useContext(AuthContext);
@@ -24,7 +24,13 @@ export default function Navbar() {
                     Admin Panel
                   </Link>
                 )}
-                <div className="flex items-center gap-2 text-zinc-300">
+                
+                <Link to="/mylist" className="flex items-center gap-2 text-zinc-300 hover:text-white transition-colors mr-2">
+                  <Bookmark className="h-5 w-5" />
+                  <span className="hidden sm:block">My List</span>
+                </Link>
+
+                <div className="flex items-center gap-2 text-zinc-300 border-l border-zinc-700 pl-4">
                   <User className="h-5 w-5" />
                   <span className="hidden sm:block">{user.email.split('@')[0]}</span>
                 </div>

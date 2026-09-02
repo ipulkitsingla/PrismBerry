@@ -19,6 +19,12 @@ export default function Watch() {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setMovie(res.data);
+        
+        // Add to watch history silently
+        axios.post('http://localhost:5000/api/user/history', { movieId: id }, {
+          headers: { Authorization: `Bearer ${user.token}` }
+        }).catch(err => console.error('Failed to log watch history'));
+        
       } catch (err) {
         setError('Failed to load movie');
       } finally {

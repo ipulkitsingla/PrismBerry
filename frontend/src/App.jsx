@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Watch from './pages/Watch';
 import Admin from './pages/Admin';
+import MyList from './pages/MyList';
 import Navbar from './components/Navbar';
 
 const ProtectedRoute = ({ children }) => {
@@ -30,6 +31,14 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
+              <Route 
+                path="/mylist" 
+                element={
+                  <ProtectedRoute>
+                    <MyList />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/watch/:id" 
                 element={

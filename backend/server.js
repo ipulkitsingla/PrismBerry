@@ -5,6 +5,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const movieRoutes = require('./routes/movies');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
@@ -17,6 +18,7 @@ mongoose.connect(process.env.MONGODB_URI)
 
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', movieRoutes);
+app.use('/api/user', userRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
