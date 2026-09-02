@@ -87,7 +87,7 @@ export default function Home() {
             <h2 className="text-2xl font-bold text-white border-l-4 border-red-600 pl-3 mb-6">Continue Watching</h2>
             <div className="flex overflow-x-auto gap-6 pb-4 snap-x no-scrollbar">
               {watchHistory.map(movie => (
-                <div key={`history-${movie._id}`} className="min-w-[150px] md:min-w-[180px] snap-start">
+                <div key={`history-${movie._id}`} className="w-[150px] md:w-[180px] flex-none snap-start">
                   <MovieCard movie={movie} initialInList={myList.some(m => m._id === movie._id)} />
                 </div>
               ))}
