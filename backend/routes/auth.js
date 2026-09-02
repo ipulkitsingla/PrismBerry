@@ -21,10 +21,13 @@ router.post('/signup', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    const userCount = await User.countDocuments();
+    const assignedRole = role || (userCount === 0 ? 'admin' : 'user');
+
     user = new User({
       email,
       password: hashedPassword,
-      role: role || 'user'
+      role: assignedRole
     });
 
     await user.save();
