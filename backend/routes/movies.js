@@ -47,36 +47,50 @@ router.get('/:id', verifyToken, async (req, res) => {
   }
 });
 
-// Scrape IMDb data (Admin only)
+// Search OMDB for movies by Title (Admin only)
+router.get('/imdb/search', verifyToken, verifyAdmin, async (req, res) => {
+  try {
+    const { title } = req.query; 
+    if (!title) return res.status(400).json({ message: 'Movie title is required' });
+
+    const url = `https://www.omdbapi.com/?apikey=thewdb&s=${encodeURIComponent(title)}&type=movie`;
+    const response = await axios.get(url);
+
+    if (response.data.Response === 'False') {
+      return res.status(400).json({ message: 'No movies found.' });
+    }
+
+    // Return the array of search results
+    res.json(response.data.Search);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error searching movie data' });
+  }
+});
+
+// Scrape exact OMDB data by IMDb ID (Admin only)
 router.get('/imdb/scrape', verifyToken, verifyAdmin, async (req, res) => {
   try {
-    const { imdbId } = req.query; // e.g. tt1375666
+    const { imdbId } = req.query; 
     if (!imdbId) return res.status(400).json({ message: 'imdbId is required' });
 
-    const url = `https://www.imdb.com/title/${imdbId}/`;
-    const response = await axios.get(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
-      }
-    });
+    const url = `https://www.omdbapi.com/?apikey=thewdb&i=${imdbId}`;
+    const response = await axios.get(url);
 
-    const $ = cheerio.load(response.data);
-    const title = $('h1').text().trim();
-    const description = $('span[data-testid="plot-xl"]').text().trim() || $('span[data-testid="plot-l"]').text().trim();
-    const posterUrl = $('.ipc-image').attr('src');
-    
-    // Simplistic genre scraping
-    let genres = [];
-    $('.ipc-chip-list__scroller a').each((i, el) => {
-      const g = $(el).text().trim();
-      if (g) genres.push(g);
-    });
-    const genre = genres.length > 0 ? genres[0] : 'Unknown';
+    if (response.data.Response === 'False') {
+      return res.status(400).json({ message: 'Could not find movie data.' });
+    }
+
+    const data = response.data;
+    const title = data.Title || '';
+    const description = data.Plot || 'No description available.';
+    const posterUrl = data.Poster !== 'N/A' ? data.Poster : '';
+    const genre = data.Genre || 'Unknown';
 
     res.json({ title, description, posterUrl, genre, imdbId });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error scraping IMDb' });
+    res.status(500).json({ message: 'Error scraping movie data' });
   }
 });
 
