@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { API_URL } from '../config';
 import { Search, Plus } from 'lucide-react';
 
 export default function Admin() {
@@ -21,7 +22,7 @@ export default function Admin() {
     let idToSearch = searchTitle.trim();
 
     try {
-      const res = await axios.get(`http://localhost:5000/api/movies/imdb/search?title=${encodeURIComponent(idToSearch)}&t=${Date.now()}`, {
+      const res = await axios.get(`${API_URL}/movies/imdb/search?title=${encodeURIComponent(idToSearch)}&t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setSearchResults(res.data);
@@ -38,7 +39,7 @@ export default function Admin() {
     setMessage({ type: '', text: '' });
     
     try {
-      const res = await axios.get(`http://localhost:5000/api/movies/imdb/scrape?imdbId=${imdbId}&t=${Date.now()}`, {
+      const res = await axios.get(`${API_URL}/movies/imdb/scrape?imdbId=${imdbId}&t=${Date.now()}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setMovieData(res.data);
@@ -58,7 +59,7 @@ export default function Admin() {
     
     setSaving(true);
     try {
-      await axios.post('http://localhost:5000/api/movies', {
+      await axios.post(`${API_URL}/movies`, {
         ...movieData,
         youtubeLink
       }, {

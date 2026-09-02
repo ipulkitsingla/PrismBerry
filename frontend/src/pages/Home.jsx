@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { API_URL } from '../config';
 import MovieCard from '../components/MovieCard';
 import { Search } from 'lucide-react';
 
@@ -16,8 +17,8 @@ export default function Home() {
     const fetchData = async () => {
       try {
         const [moviesRes, profileRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/movies'),
-          user ? axios.get('http://localhost:5000/api/user/profile', {
+          axios.get(`${API_URL}/movies`),
+          user ? axios.get(`${API_URL}/user/profile`, {
             headers: { Authorization: `Bearer ${user.token}` }
           }).catch(() => null) : Promise.resolve(null)
         ]);

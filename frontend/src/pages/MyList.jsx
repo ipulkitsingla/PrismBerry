@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { API_URL } from '../config';
 import MovieCard from '../components/MovieCard';
 
 export default function MyList() {
@@ -11,7 +12,7 @@ export default function MyList() {
   useEffect(() => {
     const fetchMyList = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/user/profile', {
+        const res = await axios.get(`${API_URL}/user/profile`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setMyList(res.data.myList || []);

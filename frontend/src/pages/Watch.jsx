@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+import { API_URL } from '../config';
 import YouTube from 'react-youtube';
 import { ArrowLeft } from 'lucide-react';
 
@@ -15,13 +16,13 @@ export default function Watch() {
   useEffect(() => {
     const fetchMovie = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/movies/${id}`, {
+        const res = await axios.get(`${API_URL}/movies/${id}`, {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setMovie(res.data);
         
         // Add to watch history silently
-        axios.post('http://localhost:5000/api/user/history', { movieId: id }, {
+        axios.post(`${API_URL}/user/history`, { movieId: id }, {
           headers: { Authorization: `Bearer ${user.token}` }
         }).catch(err => console.error('Failed to log watch history'));
         

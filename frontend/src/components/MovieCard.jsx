@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Plus, Check } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
+import { API_URL } from '../config';
 import axios from 'axios';
 
 export default function MovieCard({ movie, initialInList = false }) {
@@ -20,7 +21,7 @@ export default function MovieCard({ movie, initialInList = false }) {
     
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/user/mylist', { movieId: movie._id }, {
+      await axios.post(`${API_URL}/user/mylist`, { movieId: movie._id }, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setInList(!inList);
